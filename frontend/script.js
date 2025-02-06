@@ -63,25 +63,45 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
   function displayAnalysisResults(jsonData) {
     const analysis = JSON.parse(jsonData); // Analyse les données JSON
     let resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = '';
-  
-    if (analysis.statistics) {
-        resultDiv.innerHTML += `<h3>Statistiques :</h3>`;
+    resultDiv.innerHTML = ''; // Vide le contenu de l'élément result
+
+    // Catégorie : Prix
+    if (analysis.statistics && analysis.statistics.Prix) {
+        resultDiv.innerHTML += `<h3>Statistiques sur les Prix :</h3>`;
         resultDiv.innerHTML += `
             <ul>
-                <li>Moyenne prix : ${analysis.statistics.Prix.moyenne}</li>
-                <li>Médiane prix : ${analysis.statistics.Prix.mediane}</li>
-                <li>Écart type prix : ${analysis.statistics.Prix.ecart_type}</li>
-                <li>Moyenne quantité : ${analysis.statistics.Quantité.moyenne}</li>
-                <li>Médiane quantité : ${analysis.statistics.Quantité.mediane}</li>
-                <li>Écart type quantité : ${analysis.statistics.Quantité.ecart_type}</li>
-                <li>Moyenne note : ${analysis.statistics.Note_Client.moyenne}</li>
-                <li>Médiane note : ${analysis.statistics.Note_Client.mediane}</li>
-                <li>Écart type note : ${analysis.statistics.Note_Client.ecart_type}</li>
+                <li><strong>Moyenne prix :</strong> ${analysis.statistics.Prix.moyenne}</li>
+                <li><strong>Médiane prix :</strong> ${analysis.statistics.Prix.mediane}</li>
+                <li><strong>Écart type prix :</strong> ${analysis.statistics.Prix.ecart_type}</li>
             </ul>
         `;
     }
-  
+
+    // Catégorie : Quantité
+    if (analysis.statistics && analysis.statistics.Quantité) {
+        resultDiv.innerHTML += `<h3>Statistiques sur la Quantité :</h3>`;
+        resultDiv.innerHTML += `
+            <ul>
+                <li><strong>Moyenne quantité :</strong> ${analysis.statistics.Quantité.moyenne}</li>
+                <li><strong>Médiane quantité :</strong> ${analysis.statistics.Quantité.mediane}</li>
+                <li><strong>Écart type quantité :</strong> ${analysis.statistics.Quantité.ecart_type}</li>
+            </ul>
+        `;
+    }
+
+    // Catégorie : Note Client
+    if (analysis.statistics && analysis.statistics.Note_Client) {
+        resultDiv.innerHTML += `<h3>Statistiques sur la Note Client :</h3>`;
+        resultDiv.innerHTML += `
+            <ul>
+                <li><strong>Moyenne note :</strong> ${analysis.statistics.Note_Client.moyenne}</li>
+                <li><strong>Médiane note :</strong> ${analysis.statistics.Note_Client.mediane}</li>
+                <li><strong>Écart type note :</strong> ${analysis.statistics.Note_Client.ecart_type}</li>
+            </ul>
+        `;
+    }
+
+    // Catégorie : Anomalies
     if (analysis.anomalies && analysis.anomalies.length > 0) {
         resultDiv.innerHTML += `<h3>Anomalies détectées :</h3>`;
         resultDiv.innerHTML += `<ul>`;
@@ -92,5 +112,4 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
     } else {
         resultDiv.innerHTML += `<p>Aucune anomalie détectée.</p>`;
     }
-  }
-  
+}

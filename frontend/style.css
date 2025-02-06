@@ -1,57 +1,142 @@
+/* Style de base */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
-  
-  .container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    width: 300px;
-    text-align: center;
-  }
-  
-  h1 {
-    font-size: 1.5em;
-    margin-bottom: 20px;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-  
-  input[type="file"] {
-    margin-bottom: 15px;
-  }
-  
-  button {
-    background: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background: #0056b3;
-  }
-  
-  #message {
-    margin-top: 15px;
-    color: green;
-    font-weight: bold;
-  }
-  
-  .hidden {
-    display: none;
-  }
-  
+  font-family: 'Arial', sans-serif;
+  background-color: #f7f9fc;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+}
+
+/* Conteneur principal */
+.container {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  text-align: center;
+  margin-bottom: 30px;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Animation au survol du conteneur */
+.container:hover {
+  transform: translateY(-5px);
+}
+
+/* Titre principal */
+h1 {
+  font-size: 1.8em;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Styles pour le formulaire */
+label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #555;
+}
+
+/* Style de l'input pour le fichier */
+input[type="file"] {
+  background-color: #f4f6f9;
+  padding: 10px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+  margin-bottom: 20px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+/* Changements au survol de l'input */
+input[type="file"]:hover {
+  border-color: #007bff;
+}
+
+/* Style du bouton */
+button {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  width: 100%;
+}
+
+/* Effet de survol sur le bouton */
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Message après l'upload */
+#message {
+  margin-top: 15px;
+  color: #28a745;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+/* Résultats d'analyse */
+#result {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  margin-top: 30px;
+  max-width: 900px;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Titre des catégories */
+#result h3 {
+  font-size: 1.4em;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+/* Liste des résultats */
+#result ul {
+  list-style-type: none;
+  padding: 0;
+  color: #555;
+  font-size: 1.1em;
+  line-height: 1.8em;
+}
+
+#result li {
+  padding-left: 20px;
+  position: relative;
+}
+
+#result li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #007bff;
+  font-size: 1.5em;
+}
+
+/* Aucune anomalie détectée */
+#result p {
+  font-size: 1.2em;
+  color: #888;
+  font-style: italic;
+}
+
+/* Masquer les éléments au démarrage */
+.hidden {
+  display: none;
+}
