@@ -1,0 +1,41 @@
+<!-- backend/templates/resultats.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats de l'analyse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Résultats de l'Analyse</h1>
+
+        <h2>Statistiques Globales</h2>
+        <ul>
+            <li>Moyenne des prix : {{ stats.moyenne_prix }}</li>
+            <li>Médiane des prix : {{ stats.mediane_prix }}</li>
+            <li>Écart-type des prix : {{ stats.ecart_type_prix }}</li>
+            <li>Moyenne des quantités : {{ stats.moyenne_quantite }}</li>
+            <li>Médiane des quantités : {{ stats.mediane_quantite }}</li>
+            <li>Écart-type des quantités : {{ stats.ecart_type_quantite }}</li>
+            <li>Moyenne des notes : {{ stats.moyenne_note }}</li>
+            <li>Médiane des notes : {{ stats.mediane_note }}</li>
+            <li>Écart-type des notes : {{ stats.ecart_type_note }}</li>
+        </ul>
+
+        <h2>Anomalies Détectées</h2>
+        {% if anomalies %}
+            <ul>
+                {% for index in anomalies %}
+                    <li>Ligne {{ index + 1 }} : Anomalie détectée</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Aucune anomalie détectée.</p>
+        {% endif %}
+
+        <p>Nombre total d'anomalies : {{ total_anomalies }}</p>
+    </div>
+</body>
+</html>

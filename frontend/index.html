@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload de fichier CSV</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Déposer un fichier CSV</h1>
+    <form id="uploadForm" method="POST" action="http://127.0.0.1:5000/upload" enctype="multipart/form-data">
+      <label for="file">Choisissez un fichier CSV :</label>
+      <input type="file" id="file" name="file" accept=".csv" required>
+      <button type="submit">Envoyer</button>
+    </form>
+    <div id="message" class="hidden">Fichier envoyé avec succès !</div>
+  </div>
+
+  <div id="result"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
