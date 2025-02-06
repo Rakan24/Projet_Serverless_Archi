@@ -1,3 +1,11 @@
+
+
+
+
+
+
+
+
 document.getElementById('uploadForm').addEventListener('submit', function(event) {
     const form = event.target;
     const message = document.getElementById('message');
@@ -30,9 +38,11 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
         message.style.color = data.status === 'success' ? 'green' : 'red';
         message.classList.remove('hidden');
         
-        // Une fois l'upload terminé, récupérer les fichiers JSON depuis Azure
+        // Une fois l'upload terminé, attendre 10 secondes avant de récupérer les fichiers JSON
         if (data.status === 'success') {
-            fetchJsonFiles(); // Charge la liste des fichiers JSON
+            setTimeout(() => {
+                fetchJsonFiles();  // Charge la liste des fichiers JSON après 10 secondes
+            }, 10000);  // 10 secondes en millisecondes
         }
     })
     .catch(error => {
@@ -45,9 +55,10 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
 
 
 
-// Fonction pour récupérer et afficher la liste des fichiers JSON
+
 // Fonction pour récupérer et afficher la liste des fichiers JSON
 function fetchJsonFiles() {
+    console.log("OKOKOKOKOKOK fetchhhhhhhhhhhh");
     fetch('http://127.0.0.1:5000/list-json-files')
         .then(response => response.json())
         .then(data => {
@@ -66,6 +77,13 @@ function fetchJsonFiles() {
         });
 }
 
+// Attente que la page soit complètement chargée avant d'appeler fetchJsonFiles()
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("OKOKOKOKOKOK");
+    fetchJsonFiles(); // Charger la liste des fichiers JSON dès que la page est prête
+});
+
+
 // Fonction pour afficher la liste des fichiers JSON dans un tableau
 function displayJsonFiles(files) {
     const table = document.getElementById('jsonFileList');
@@ -83,11 +101,17 @@ function displayJsonFiles(files) {
     } else {
         table.innerHTML = '<tr><td colspan="2">Aucun fichier JSON trouvé.</td></tr>';
     }
+
+    
+
+    
 }
 
 // Fonction pour récupérer et afficher les données JSON d'un fichier
 function fetchJsonData(filename) {
-    fetch(`http://127.0.0.1:5000/get-json-file/${filename}`)
+    const filePath = filename;  // filename devrait déjà être du genre 'csv/csv/data_normal.json'
+
+    fetch(`http://127.0.0.1:5000/get-json-file/${filePath}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -95,22 +119,43 @@ function fetchJsonData(filename) {
             return response.json();
         })
         .then(data => {
-            console.log("Réponse JSON brute reçue : ", data);  // Afficher toute la réponse brute pour débogage
+            console.log("Réponse JSON brute reçue : ", data);  // Afficher toute la réponse brute pour le débogage
 
-            if (data.status === 'success' && data.data) {
-                // Vérification de la structure des données reçues
-                console.log("Données à afficher :", data.data);  // Afficher les données spécifiques pour vérification
+            // Vérifier si le JSON contient les bonnes clés
+            if (data && data.status === 'success') {
+                const jsonData = data;  // Pas besoin de data.data, les données sont directement sous 'data'
 
-                // Vérification de la structure attendue
-                if (data.data && data.data.original_blob && data.data.analysis) {
-                    displayJsonContent(data.data); // Passe les données à la fonction d'affichage
+                // Ajout d'un log pour vérifier la structure complète des données JSON
+                console.log("Structure complète des données JSON : ", jsonData);
+
+                // Vérification de la structure attendue pour "analysis" et "stats"
+                if (jsonData && jsonData.analysis) {
+                    console.log("Clé 'analysis' trouvée : ", jsonData.analysis);
+
+                    if (jsonData.analysis.stats) {
+                        console.log("Clé 'stats' trouvée dans 'analysis' : ", jsonData.analysis.stats);
+
+                        // Vérification de la structure des anomalies
+                        if (jsonData.analysis.anomalies !== undefined) {
+                            console.log("Clé 'anomalies' trouvée dans 'analysis' : ", jsonData.analysis.anomalies);
+
+                            // Si la structure est correcte, afficher les données
+                            displayJsonContent(jsonData);
+                        } else {
+                            console.error("Erreur : La clé 'anomalies' est manquante ou incorrecte.");
+                            alert("Les données JSON sont mal formatées, la clé 'anomalies' est manquante ou incorrecte.");
+                        }
+                    } else {
+                        console.error("Erreur : La clé 'stats' est manquante dans 'analysis'.");
+                        alert("Les données JSON sont mal formatées, la clé 'stats' est manquante dans 'analysis'.");
+                    }
                 } else {
-                    console.error("Erreur : Données JSON mal formatées.", data);
-                    alert("Les données JSON sont mal formatées.");
+                    console.error("Erreur : La clé 'analysis' est manquante dans les données JSON.");
+                    alert("Les données JSON sont mal formatées, la clé 'analysis' est manquante.");
                 }
             } else {
-                console.error("Erreur ou aucune donnée :", data.message || "Données manquantes");
-                alert("Erreur dans les données reçues.");
+                console.error("Erreur : Données JSON mal formatées ou statut échoué.", data);
+                alert("Les données JSON sont mal formatées ou le statut est incorrect.");
             }
         })
         .catch(error => {
@@ -119,36 +164,15 @@ function fetchJsonData(filename) {
         });
 }
 
-
-
-
-
 // Fonction pour afficher le contenu JSON dans un conteneur avec mise en forme
-
 function displayJsonContent(jsonData) {
-    // Récupération de l'élément div où le contenu sera inséré
     const jsonContentDiv = document.getElementById("jsonContent");
 
-    // Initialisation du contenu HTML
-    let htmlContent = '';
-
-    // Vérification de la présence de original_blob
-    if (jsonData.original_blob) {
-        htmlContent += `<div class="json-section">
-                            <h3>Original Blob</h3>
-                            <p>${jsonData.original_blob}</p>
-                        </div>`;
-    } else {
-        htmlContent += `<div class="json-section">
-                            <h3>Original Blob</h3>
-                            <p>Aucune donnée disponible pour ce champ.</p>
-                        </div>`;
-    }
-
-    // Vérification de la présence de statistiques
-    if (jsonData.analysis && jsonData.analysis.stats) {
-        const stats = jsonData.analysis.stats;
-        htmlContent += `<div class="json-section">
+    // Formatage des statistiques
+    const analysis = jsonData.analysis;  // Accès à "analysis"
+    if (analysis && analysis.stats) {
+        const stats = analysis.stats;  // Accès sécurisé à "analysis.stats"
+        let htmlContent = `<div class="json-section">
                             <h3>Statistiques</h3>
                             <table>
                                 <thead>
@@ -161,45 +185,69 @@ function displayJsonContent(jsonData) {
                                 </thead>
                                 <tbody>`;
 
-        for (let category in stats) {
-            htmlContent += `<tr>
-                                <td>${category}</td>
-                                <td>${stats[category].moyenne}</td>
-                                <td>${stats[category].mediane}</td>
-                                <td>${stats[category].ecart_type}</td>
-                            </tr>`;
+        // Vérification des données dans "stats"
+        if (stats) {
+            for (let category in stats) {
+                htmlContent += `<tr>
+                                    <td>${category}</td>
+                                    <td>${stats[category].moyenne}</td>
+                                    <td>${stats[category].mediane}</td>
+                                    <td>${stats[category].ecart_type}</td>
+                                </tr>`;
+            }
+        } else {
+            htmlContent += `<tr><td colspan="4">Aucune statistique disponible.</td></tr>`;
         }
 
         htmlContent += `    </tbody>
                             </table>
                          </div>`;
-    } else {
-        htmlContent += `<div class="json-section">
-                            <h3>Statistiques</h3>
-                            <p>Aucune statistique disponible.</p>
-                         </div>`;
-    }
 
-    // Vérification de la présence d'anomalies
-    if (jsonData.analysis && jsonData.analysis.anomalies && jsonData.analysis.anomalies.length > 0) {
-        const anomalies = jsonData.analysis.anomalies;
+        // Formatage des anomalies
+        const anomalies = analysis.anomalies;  // Accès à "analysis.anomalies"
         htmlContent += `<div class="json-section">
-                            <h3>Anomalies</h3>
-                            <ul>`;
-        anomalies.forEach(anomaly => {
-            htmlContent += `<li>${anomaly}</li>`;
-        });
-        htmlContent += `</ul></div>`;
-    } else {
-        htmlContent += `<div class="json-section">
-                            <h3>Anomalies</h3>
-                            <p>Aucune anomalie détectée.</p>
-                        </div>`;
-    }
+                            <h3>Anomalies</h3>`;
 
-    // Insertion du contenu formaté dans la div
-    jsonContentDiv.innerHTML = htmlContent;
+        if (anomalies && anomalies.length > 0) {
+            htmlContent += `<ul>`;
+            anomalies.forEach(anomaly => {
+                // Vérification si l'anomalie est un objet avec des propriétés "ID" et "Erreur"
+                if (anomaly && typeof anomaly === 'object' && anomaly.ID && anomaly.Erreur) {
+                    htmlContent += `<li>ID: ${anomaly.ID} - Erreur: ${anomaly.Erreur}</li>`;
+                } else if (typeof anomaly === 'string') {
+                    // Si l'anomalie est une simple chaîne (dans le cas d'une erreur de format)
+                    htmlContent += `<li>Anomalie: ${anomaly}</li>`;
+                } else {
+                    console.error('Format d\'anomalie inattendu :', anomaly);
+                    htmlContent += `<li>Erreur dans le format de l'anomalie.</li>`;
+                }
+            });
+            htmlContent += `</ul>`;
+        } else {
+            htmlContent += `<p>Aucune anomalie détectée.</p>`;
+        }
+
+        htmlContent += `</div>`;
+
+
+        // Insertion du contenu formaté dans la div
+        jsonContentDiv.innerHTML = htmlContent;
+    } else {
+        console.error("La clé 'analysis' ou 'stats' est manquante dans les données JSON.");
+        alert("Les données JSON sont mal formatées, la clé 'analysis' ou 'stats' est manquante.");
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
