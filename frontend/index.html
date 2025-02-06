@@ -17,7 +17,25 @@
     <div id="message" class="hidden">Fichier envoyé avec succès !</div>
   </div>
 
-  <div id="result"></div>
+  <!-- Tableau pour lister les fichiers JSON -->
+  <div class="container">
+    <h2>Fichiers JSON disponibles</h2>
+    <table id="jsonFileList">
+      <thead>
+        <tr>
+          <th>Nom du fichier</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Les fichiers JSON seront listés ici -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section pour afficher les détails d'un fichier JSON -->
+  <div class="container" id="jsonContent">
+    <!-- Le contenu JSON sera affiché ici -->
+  </div>
 
   <script src="script.js"></script>
 </body>

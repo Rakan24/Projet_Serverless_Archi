@@ -49,6 +49,10 @@ else:
         file.save(file_path)
         return f"Fichier '{file.filename}' téléchargé avec succès en local."
 
+
+
+#Route pour upload un fichier CSV sur AZURE
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -76,6 +80,70 @@ def upload_file():
         return jsonify({"message": f"Erreur lors de l'upload : {str(e)}", "status": "error"}), 500
 
 
+#Route pour récupérer TOUS les fichiers json sur AZURE
+@app.route('/list-json-files', methods=['GET'])
+def list_json_files():
+    try:
+        # Vérifie si Azure est configuré
+        if AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY and AZURE_CONTAINER_NAME:
+            # Liste des fichiers JSON dans le conteneur Azure, sous le chemin 'csv/csv/'
+            blob_list = container_client.list_blobs(name_starts_with='')  # Lister les fichiers sous ce préfixe
+            files = [blob.name for blob in blob_list if blob.name.endswith('.json')]  # Filtrer uniquement les fichiers .json
+
+            # Si aucun fichier JSON n'est trouvé, renvoie une réponse vide
+            if not files:
+                return jsonify({
+                    "status": "success",
+                    "message": "Aucun fichier JSON trouvé dans 'csv/csv/'.",
+                    "files": []
+                }), 200
+        else:
+            # Si tu utilises un stockage local
+            files = [f for f in os.listdir(os.path.join(UPLOAD_FOLDER, 'csv/csv')) if f.endswith('.json')]
+
+        # Renvoie la liste des fichiers JSON trouvés
+        return jsonify({
+            "status": "success",
+            "files": files
+        }), 200
+
+    except Exception as e:
+        print(f"Erreur lors de la récupération des fichiers JSON: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": f"Erreur lors de la récupération des fichiers : {str(e)}"
+        }), 500
+
+
+
+
+#Route pour afficher contenu du json cliqué 
+@app.route('/get-json-file/<filename>', methods=['GET'])
+def get_json_file(filename):
+    try:
+        # Utilise directement le filename passé, sans ajout de préfixe supplémentaire
+        full_filename = f"{filename}"
+
+        # Vérifie si le fichier existe dans Azure Blob Storage
+        blob_client = container_client.get_blob_client(full_filename)
+        
+        if blob_client.exists():
+            # Récupère les données du fichier et les renvoie
+            json_data = blob_client.download_blob().readall().decode('utf-8')
+            return jsonify({"status": "success", "data": json_data}), 200
+        else:
+            # Si le fichier n'existe pas, renvoie une erreur
+            return jsonify({"status": "error", "message": f"Le fichier {filename} n'existe pas."}), 404
+    
+    except Exception as e:
+        print(f"Erreur lors de la récupération du fichier JSON {filename}: {str(e)}")
+        return jsonify({"status": "error", "message": f"Erreur lors de la récupération du fichier : {str(e)}"}), 500
+
+
+
+
+
+#ROUTE A SUPPR ?????
 @app.route('/get-result', methods=['GET'])
 def get_analysis_result():
     try:
