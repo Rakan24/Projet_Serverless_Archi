@@ -76,6 +76,34 @@ def upload_file():
         return jsonify({"message": f"Erreur lors de l'upload : {str(e)}", "status": "error"}), 500
 
 
+@app.route('/get-result', methods=['GET'])
+def get_analysis_result():
+    try:
+        # Nom fixe du fichier result.json
+        json_filename = "result.json"
+        
+        if AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY and AZURE_CONTAINER_NAME:
+            # Récupère le fichier JSON depuis Azure Blob Storage
+            blob_client = container_client.get_blob_client(json_filename)
+            if blob_client.exists():
+                json_data = blob_client.download_blob().readall().decode('utf-8')
+                return jsonify({"status": "success", "data": json_data}), 200
+            else:
+                return jsonify({"status": "error", "message": f"Le fichier {json_filename} n'existe pas."}), 404
+        else:
+            # Récupère le fichier JSON depuis le stockage local
+            file_path = os.path.join(UPLOAD_FOLDER, json_filename)
+            if os.path.exists(file_path):
+                with open(file_path, 'r', encoding='utf-8') as json_file:
+                    json_data = json_file.read()
+                return jsonify({"status": "success", "data": json_data}), 200
+            else:
+                return jsonify({"status": "error", "message": f"Le fichier {json_filename} n'existe pas."}), 404
+    except Exception as e:
+        print(f"Erreur lors de la récupération du fichier JSON : {str(e)}")
+        return jsonify({"status": "error", "message": f"Erreur lors de la récupération : {str(e)}"}), 500
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
