@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 document.getElementById('uploadForm').addEventListener('submit', function(event) {
     const form = event.target;
     const message = document.getElementById('message');
@@ -107,6 +99,10 @@ function displayJsonFiles(files) {
     
 }
 
+
+
+
+
 // Fonction pour récupérer et afficher les données JSON d'un fichier
 function fetchJsonData(filename) {
     const filePath = filename;  // filename devrait déjà être du genre 'csv/csv/data_normal.json'
@@ -123,7 +119,15 @@ function fetchJsonData(filename) {
 
             // Vérifier si le JSON contient les bonnes clés
             if (data && data.status === 'success') {
-                const jsonData = data;  // Pas besoin de data.data, les données sont directement sous 'data'
+                // Parser la chaîne de caractères dans 'data' pour obtenir un objet JSON
+                let jsonData;
+                try {
+                    jsonData = JSON.parse(data.data);  // Analyser la chaîne JSON dans 'data'
+                } catch (e) {
+                    console.error('Erreur lors du parsing du JSON :', e);
+                    alert("Erreur lors de la conversion des données JSON.");
+                    return;
+                }
 
                 // Ajout d'un log pour vérifier la structure complète des données JSON
                 console.log("Structure complète des données JSON : ", jsonData);
@@ -170,6 +174,8 @@ function displayJsonContent(jsonData) {
 
     // Formatage des statistiques
     const analysis = jsonData.analysis;  // Accès à "analysis"
+    console.log("Affichage des données d'analyse : ", analysis);
+
     if (analysis && analysis.stats) {
         const stats = analysis.stats;  // Accès sécurisé à "analysis.stats"
         let htmlContent = `<div class="json-section">
